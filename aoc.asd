@@ -6,9 +6,13 @@
   :license "MIT"
   :depends-on (#:coalton
                #:alexandria
+               #:split-sequence
                #:uiop)
   :serial t
   :components ((:module "2021"
                 :serial t
                 :components ((:file "package")
-                             (:file "1")))))
+                             (:module "1"
+                              :serial t
+                              :components ((:static-file "1.input")
+                                           (:file "1")))))))
