@@ -10,10 +10,12 @@
 
 (coalton-toplevel
   ;; Part I
+
   (define aoc1-input-file
     (lisp String ()
       (cl:namestring
        (asdf:system-relative-pathname ':aoc "2021/1/1.input"))))
+
 
   (declare read-file-into-string (String -> (Optional String)))
   (define (read-file-into-string filename)
@@ -25,6 +27,7 @@
                None
                (Some contents)))))
 
+
   (declare split-string (Char -> String -> (List String)))
   (define (split-string c s)
     "Split the string S into substrings that are delineated by C."
@@ -32,18 +35,23 @@
       (cl-list-to-coalton
        (split-sequence:split-sequence c s))))
 
+
   (declare parse-int-or-fail (String -> Integer))
   (define (parse-int-or-fail s)
+    "Parse the string S as an integer, or error."
     (fromSome "Failed to parse integer." (parse-int s)))
+
 
   (declare read-aoc-data (Unit -> (List Integer)))
   (define (read-aoc-data _)
+    "Read the data for problem 1, which is a list of integers."
     (let ((data (fromSome "Couldn't read AOC1 data."
                           (read-file-into-string aoc1-input-file))))
       (map parse-int-or-fail
            (filter (/= "") (split-string #\Newline data)))))
 
-  (define-instance (Eq Ord)
+
+  (define-instance (Eq Ord)             ; Should be in stdlib
     (define (== a b)
       (match (Tuple a b)
         ((Tuple (LT) (LT)) True)
@@ -53,8 +61,10 @@
     (define (/= a b)
       (not (== a b))))
 
+
   (declare countBy ((:a -> Boolean) -> (List :a) -> Integer))
-  (define (countby f things)
+  (define (countby f things)            ; Should be in stdlib
+    "Count the number of items in THINGS that satisfy the predicate F."
     (let ((rec (fn (things count)
                  (match things
                    ((Nil) count)
@@ -63,24 +73,31 @@
                                     (rec xs count)))))))
       (rec things 0)))
 
+
   (declare changes (Ord :a => ((List :a) -> (List Ord))))
   (define (changes things)
+    "Return a list of neighboring numerical comparisons found in THINGS."
     (match things
       ((Nil) Nil)
       ((Cons _ tail)
        (zipWith <=> things tail))))
 
+
   (declare count-increasing-pairs ((List Integer) -> Integer))
   (define (count-increasing-pairs ints)
+    "How many times does the list of INTS increase?"
     (countby (== LT) (changes ints)))
+
 
   (declare aoc1.1-solution (Unit -> Integer))
   (define (aoc1.1-solution _)
     (count-increasing-pairs (read-aoc-data)))
 
+
   ;; Part II
   (declare cleave (Integer -> (List :a) -> (Tuple (List :a) (List :a))))
   (define (cleave n xs)
+    "Chop XS into a two lists, a head (of length N or less) and a tail (the remainder)."
     (let ((rec (fn (n xs ys)
                  (if (== 0 n)
                      (Tuple (reverse ys) xs)
@@ -89,24 +106,31 @@
                        ((Nil) (rec 0 xs ys)))))))
       (rec n xs Nil)))
 
+
   (declare take (Integer -> (List :a) -> (List :a)))
-  (define (take n xs)
+  (define (take n xs)                   ; should be in stdlib
+    "Take N elements from XS, or fewer if |XS| < N."
     (fst (cleave n xs)))
 
+
   (declare cdr ((List :a) -> (List :a)))
-  (define (cdr xs)
+  (define (cdr xs)                      ; should be in stdlib
+    "Return the traditional cdr of a list XS."
     (match xs
       ((Cons _ xs) xs)
       ((Nil) Nil)))
 
+
   (declare windows (Integer -> (List :a) -> (List (List :a))))
   (define (windows n xs)
+    "Create a list of sliding windows of exactly length N from the list XS."
     (let ((rec (fn (xs windows)
                  (let ((head (take n xs)))
                    (if (== n (length head))
                        (rec (cdr xs) (cons head windows))
                        (reverse windows))))))
       (rec xs Nil)))
+
 
   (declare aoc1.2-solution (Unit -> Integer))
   (define (aoc1.2-solution _)
@@ -129,4 +153,3 @@
 ;;; - lots of missing list utilities
 ;;;
 ;;; - trailing whitespace from COALTON-TOPLEVEL
-
