@@ -16,4 +16,8 @@
                              (:module "1"
                               :serial t
                               :components ((:static-file "1.input")
-                                           (:file "1")))))))
+                                           (:file "1")))
+                             (:module "2"
+                              :serial t
+                              :components ((:static-file "2.input")
+                                           (:file "2")))))))

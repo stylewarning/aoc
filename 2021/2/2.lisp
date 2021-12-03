@@ -41,8 +41,8 @@
            (filter (/= "") (string-lines data)))))
 
   
-  (declare execute-sub-instructions ((List Sub-Instruction) -> (Tuple Integer Integer)))
-  (define (execute-sub-instructions isns)
+  (declare execute-sub-instructions1 ((List Sub-Instruction) -> (Tuple Integer Integer)))
+  (define (execute-sub-instructions1 isns)
     (let ((exec (fn (isns x y)
                   (match isns
                     ((Nil)
@@ -57,9 +57,27 @@
   
   (declare aoc2.1-solution (Unit -> Integer))
   (define (aoc2.1-solution _)
-    (match (execute-sub-instructions (read-aoc2-data))
+    (match (execute-sub-instructions1 (read-aoc2-data))
       ((Tuple x y) (* x y))))
 
 
   ;; Part II
+
+  (declare execute-sub-instructions2 ((List Sub-Instruction) -> (Tuple Integer Integer)))
+  (define (execute-sub-instructions2 isns)
+    (let ((exec (fn (isns x y aim)
+                  (match isns
+                    ((Nil)
+                     (Tuple x y))
+                    ((Cons isn isns)
+                     (match isn
+                       ((Sub-Forward n) (exec isns (+ x n) (+ y (* aim n)) aim))
+                       ((Sub-Up n)      (exec isns x       y               (- aim n)))
+                       ((Sub-Down n)    (exec isns x       y               (+ aim n)))))))))
+      (exec isns 0 0 0)))
+
+  (declare aoc2.2-solution (Unit -> Integer))
+  (define (aoc2.2-solution _)
+    (match (execute-sub-instructions2 (read-aoc2-data))
+      ((Tuple x y) (* x y))))
   )
