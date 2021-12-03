@@ -43,7 +43,7 @@
 
   (declare epsilon-bits-from-gamma-bits ((List Integer) -> (List Integer)))
   (define epsilon-bits-from-gamma-bits (map (- 1)))
-  
+
 
   (declare bits->int ((List Integer) -> Integer))
   (define (bits->int bits)
@@ -52,7 +52,7 @@
                    ((Nil) result)
                    ((Cons b bits) (rec bits (+ b (* 2 result))))))))
       (rec bits 0)))
-  
+
 
   (declare aoc3.1-solution (Unit -> Integer))
   (define (aoc3.1-solution _)
@@ -64,6 +64,33 @@
 
   ;; Part II
 
+  (declare life-support-rating ((Integer -> Integer -> Boolean)
+                                -> (List (List Integer))
+                                -> (List Integer)))
+  (define (life-support-rating f data)
+    (let ((n (length (nth 0 data)))
+          (rec (fn (i data)
+                 (if (or (singleton-list? data)
+                         (== n i))
+                     data
+                     (match (count-01 (map (nth i) data))
+                       ((Tuple zeros ones)
+                        (if (f zeros ones)
+                            (rec (+ 1 i) (filter (compose (== 0) (nth i)) data))
+                            (rec (+ 1 i) (filter (compose (== 1) (nth i)) data)))))))))
+      (match (rec 0 data)
+        ((Nil)               (error "Didn't find a life-support rating"))
+        ((Cons rating (Nil)) rating)
+        (_                   (error "Ambiguous life-support rating")))))
+
+
+  (define oxygen-generator-rating (life-support-rating >))
+  (define co2-generator-rating    (life-support-rating <=))
+
+
   (declare aoc3.2-solution (Unit -> Integer))
-  (define (aoc3.2-solution _)
-    0))
+    (define (aoc3.2-solution _)
+    (let ((data   (read-aoc3-data)))
+      (* (bits->int (oxygen-generator-rating data))
+         (bits->int (co2-generator-rating data)))))
+)

@@ -10,7 +10,7 @@
     (lisp String (rel-path)
       (cl:namestring
        (asdf:system-relative-pathname ':aoc rel-path))))
- 
+
   (declare read-file-into-string (String -> (Optional String)))
   (define (read-file-into-string filename)
     "Read the file named FILENAME into a string."
@@ -47,6 +47,13 @@
       ((Cons _ xs) xs)
       ((Nil) Nil)))
 
+  (declare nth (Integer -> (List :t) -> :t))
+  (define (nth n l)
+    (fromSome "There is no NTH" (index l n)))
 
-
-  )
+  (declare singleton-list? ((List :t) -> Boolean))
+  (define (singleton-list? x)
+    (match x
+      ((Nil)          False)
+      ((Cons _ (Nil)) True)
+      (_              False))))
