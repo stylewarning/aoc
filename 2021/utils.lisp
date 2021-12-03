@@ -29,6 +29,11 @@
       (cl-list-to-coalton
        (split-sequence:split-sequence c s))))
 
+  (declare string-lines (String -> (List String)))
+  (define string-lines (split-string #\Newline))
+
+  (declare string-tokens (String -> (List String)))
+  (define string-tokens (split-string #\Space))
 
   (declare parse-int-or-fail (String -> Integer))
   (define (parse-int-or-fail s)

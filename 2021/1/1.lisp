@@ -20,7 +20,7 @@
     (let ((data (fromSome "Couldn't read AOC1 data."
                           (read-file-into-string aoc1-input-file))))
       (map parse-int-or-fail
-           (filter (/= "") (split-string #\Newline data)))))
+           (filter (/= "") (string-lines data)))))
 
 
   (declare changes (Ord :a => ((List :a) -> (List Ord))))
