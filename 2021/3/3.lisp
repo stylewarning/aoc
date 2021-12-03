@@ -46,12 +46,7 @@
 
 
   (declare bits->int ((List Integer) -> Integer))
-  (define (bits->int bits)
-    (let ((rec (fn (bits result)
-                 (match bits
-                   ((Nil) result)
-                   ((Cons b bits) (rec bits (+ b (* 2 result))))))))
-      (rec bits 0)))
+  (define bits->int (fold (fn (b sum) (+ b (* 2 sum))) 0))
 
 
   (declare aoc3.1-solution (Unit -> Integer))
