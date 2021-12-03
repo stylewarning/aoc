@@ -1,6 +1,6 @@
 ;;;; 2.lisp
 ;;;;
-;;;; https://adventofcode.com/2021/day/1
+;;;; https://adventofcode.com/2021/day/2
 
 (cl:in-package #:aoc2021-cl)
 
@@ -75,6 +75,7 @@
                        ((Sub-Up n)      (exec isns x       y               (- aim n)))
                        ((Sub-Down n)    (exec isns x       y               (+ aim n)))))))))
       (exec isns 0 0 0)))
+
 
   (declare aoc2.2-solution (Unit -> Integer))
   (define (aoc2.2-solution _)
