@@ -46,7 +46,7 @@
 
 
   (declare bits->int ((List Integer) -> Integer))
-  (define bits->int (fold (fn (b sum) (+ b (* 2 sum))) 0))
+  (define bits->int (fold (fn (b sum) (pipe sum (* 2) (+ b))) 0))
 
 
   (declare aoc3.1-solution (Unit -> Integer))
