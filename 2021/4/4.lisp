@@ -104,11 +104,12 @@
                                (rec rest-rowcols smallest-call smallest-position))))))))))
         (rec rowcols None 10000))))
 
-  (declare earliest-winning-board ((Integer -> (Optional Integer))
-                                   -> (List (List (List Integer)))
-                                   -> (Optional (Tuple Integer
-                                                       (List (List Integer))))))
-  (define (earliest-winning-board posfun boards)
+  (declare somethingest-winning-board ((Integer -> Integer -> Boolean)
+                                       -> (Integer -> (Optional Integer))
+                                       -> (List (List (List Integer)))
+                                       -> (Optional (Tuple Integer
+                                                           (List (List Integer))))))
+  (define (somethingest-winning-board comparator posfun boards)
     (let ((rec (fn (boards winning-board winning-call winning-position)
                  (match boards
                    ((Nil)
@@ -122,10 +123,13 @@
                        (rec boards winning-board winning-call winning-position))
                       ((Some call)
                        (let ((callpos (fromSome "oof" (posfun call))))
-                         (if (< callpos winning-position)
+                         (if (or (isNone winning-call)
+                                 (comparator callpos winning-position))
                              (rec boards board (Some call) callpos)
                              (rec boards winning-board winning-call winning-position))))))))))
-      (rec boards Nil None 10000)))
+      (rec boards Nil None -1)))
+  
+  (define earliest-winning-board (somethingest-winning-board <))
 
   (declare posfun-cheat ((Integer -> (Optional Integer))
                          -> Integer -> Integer))
@@ -153,8 +157,21 @@
            ((None) None)
            ((Some (Tuple call board))
             (Some (* call (sum (unmarked-numbers-after-position posfun board (fromSome "oof" (posfun call))))))))))))
+  
+  
   ;; Part II
 
+  (define latest-winning-board (somethingest-winning-board >))
+  
+  (declare aoc4.2-solution (Unit -> (Optional Integer)))
+  (define (aoc4.2-solution _)
+    (match (read-aoc4-data)
+      ((Tuple calls boards)
+       (let ((posfun (bingo-call-position-function calls)))
+         (match (latest-winning-board posfun boards)
+           ((None) None)
+           ((Some (Tuple call board))
+            (Some (* call (sum (unmarked-numbers-after-position posfun board (fromSome "oof" (posfun call))))))))))))
 )
 
-;;; really need minimumBy
+;;; really need minimumBy or something
