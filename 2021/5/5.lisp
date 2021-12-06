@@ -14,65 +14,38 @@
   (define-type Point2d
     (Point2d Integer Integer))
 
-  (define (point-x p)
-    (match p
-      ((Point2d x _) x)))
-
-  (define (point-y p)
-    (match p
-      ((Point2d _ y) y)))
-
   (define (point->list p)
-    (make-list (point-x p) (point-y p)))
-
-  (define-instance (Eq Point2d)
-    (define (== p q)
-      (and (== (point-x p) (point-x q))
-           (== (point-y p) (point-y q)))))
+    (match p
+      ((Point2d x y) (make-list x y))))
 
   (define-type Line2d
-    (Line2d Point2d Point2d)
-    (HLine2d Integer Integer Integer)
-    (VLine2d Integer Integer Integer))
+    (Line2d Point2d Point2d))
 
   (define (make-line x1 y1 x2 y2)
-    (cond
-      ((== y1 y2) (if (< x1 x2)
-                      (HLine2d y1 x1 x2)
-                      (HLine2d y1 x2 x1)))
-      ((== x1 x2) (if (< y1 y2)
-                      (VLine2d x1 y1 y2)
-                      (VLine2d x1 y2 y1)))
-      (True (Line2d (Point2d x1 y1)
-                    (Point2d x2 y2)))))
+    (Line2d (Point2d x1 y1)
+            (Point2d x2 y2)))
 
-  (define (rasterize l)
-    (match l
-      ((HLine2d y x1 x2)
-       (map ((flip Point2D) y) (range x1 x2)))
-      ((VLine2d x y1 y2)
-       (map (Point2D x) (range y1 y2)))
-      ((Line2d (Point2d x1 y1)
-               (Point2d x2 y2))
-       (zipWith Point2d
-                (range x1 x2)
-                (range y1 y2)))))
-
-  (define (horizontal-line line)
+    (define (horizontal-line line)
     (match line
       ((Line2d (Point2d _ y1) (Point2d _ y2))
-       (== y1 y2))
-      ((HLine2d _ _ _) True)
-      ((VLine2d _ y1 y2) (== y1 y2))))
+       (== y1 y2))))
 
   (define (vertical-line line)
     (match line
       ((Line2d (Point2d x1 _) (Point2d x2 _))
-       (== x1 x2))
-      ((HLine2d _ x1 x2) (== x1 x2))
-      ((VLine2d _ _ _) True)))
+       (== x1 x2))))
 
-  (define axis-aligned-line (disjoin horizontal-line vertical-line))
+  (define (rasterize l)
+    (match l
+      ((Line2d (Point2d x1 y1)
+               (Point2d x2 y2))
+       (cond
+         ((vertical-line   l) (map (Point2d x1)        (range y1 y2)))
+         ((horizontal-line l) (map ((flip Point2d) y1) (range x1 x2)))
+         (True                (zipWith Point2d
+                                       (range x1 x2)
+                                       (range y1 y2)))))))
+
 
 
   (define aoc5-input-file (aoc-relative "2021/5/5.input"))
@@ -126,7 +99,7 @@
   (define (aoc5.1-solution _)
     (pipe
      (read-aoc5-data)
-     (filter axis-aligned-line)
+     (filter (disjoin horizontal-line vertical-line))
      count-intersections))
 
 
