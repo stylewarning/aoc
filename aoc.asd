@@ -27,9 +27,13 @@
                                            (:file "3")))
                              (:module "4"
                               :serial t
-                              :components (;;(:static-file "3.input")
+                              :components ((:static-file "4.input")
                                            (:file "4")))
                              (:module "5"
                               :serial t
-                              :components (;;(:static-file "3.input")
-                                           (:file "5")))))))
+                              :components ((:static-file "5.input")
+                                           (:file "5")))
+                             (:module "6"
+                              :serial t
+                              :components ((:static-file "6.input")
+                                           (:file "6")))))))

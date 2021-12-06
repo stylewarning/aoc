@@ -25,7 +25,7 @@
     (Line2d (Point2d x1 y1)
             (Point2d x2 y2)))
 
-    (define (horizontal-line line)
+  (define (horizontal-line line)
     (match line
       ((Line2d (Point2d _ y1) (Point2d _ y2))
        (== y1 y2))))
