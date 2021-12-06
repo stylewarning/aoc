@@ -2,6 +2,11 @@
 
 (cl:in-package #:aoc2021-cl)
 
+(defun optionalify (x)
+  (if (null x)
+      coalton-library:None
+      (coalton-library:Some x)))
+
 (cl:in-package #:aoc2021)
 
 (coalton-toplevel
@@ -21,19 +26,73 @@
                None
                (Some contents)))))
 
+  (declare string-length (String -> Integer))
+  (define (string-length str)
+    "The length of a string STR."
+    (lisp Integer (str)
+      (cl:length str)))
+
+  (define (conjoin f g x)
+    (and (f x) (g x)))
+
+  (define (disjoin f g x)
+    (or (f x) (g x)))
+
+  (define (complement f x)
+    (not (f x)))
+
+  (define (list-foreach f l)
+    (match l
+      ((Nil) Unit)
+      ((Cons x xs) (progn
+                     (f x)
+                     (list-foreach f xs)))))
+
+  (declare substring (String -> Integer -> Integer -> String))
+  (define (substring str start end)
+    (let ((real-start (max 0 (min start end)))
+          (real-end (min (string-length str) (max start end))))
+      (lisp String (real-start real-end str)
+        (cl:subseq str real-start real-end))))
 
   (declare split-string (Char -> String -> (List String)))
   (define (split-string c s)
     "Split the string S into substrings that are delineated by C."
     (lisp (List String) (c s)
-      (cl-list-to-coalton
-       (split-sequence:split-sequence c s))))
+      (cl:values (split-sequence:split-sequence c s))))
 
   (declare string-lines (String -> (List String)))
   (define string-lines (split-string #\Newline))
 
   (declare string-tokens (String -> (List String)))
   (define string-tokens (split-string #\Space))
+
+  (declare string-search-at (Integer -> String -> String -> (Optional Integer)))
+  (define (string-search-at start needle haystack)
+    (lisp (Optional Integer) (needle start haystack)
+      (aoc2021-cl::optionalify
+       (cl:search needle haystack :start2 start :test #'cl:char=))))
+
+  (declare string-search (String -> String -> (Optional Integer)))
+  (define string-search (string-search-at 0))
+
+  (declare wedge-string (String -> String -> (List String)))
+  (define (wedge-string wedge string)
+    "Like STRING-SPLIT, but works with strings and not characters."
+    (let ((wedge-size (string-length wedge))
+          (string-size (string-length string)))
+      (let ((rec (fn (start found-strings)
+                   (match (string-search-at start wedge string)
+                     ((None)
+                      (if (== start (string-length string))
+                          (reverse found-strings)
+                          (reverse (Cons (substring string start string-size)
+                                         found-strings))))
+                     ((Some location)
+                      (rec (+ location wedge-size)
+                           (Cons (substring string start location)
+                                 found-strings)))))))
+        (rec 0 Nil))))
 
   (declare parse-int-or-fail (String -> Integer))
   (define (parse-int-or-fail s)
