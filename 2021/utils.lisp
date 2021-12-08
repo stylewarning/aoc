@@ -26,34 +26,12 @@
                None
                (Some contents)))))
 
-  (declare string-length (String -> Integer))
-  (define (string-length str)
-    "The length of a string STR."
-    (lisp Integer (str)
-      (cl:length str)))
-
-  (define (conjoin f g x)
-    (and (f x) (g x)))
-
-  (define (disjoin f g x)
-    (or (f x) (g x)))
-
-  (define (complement f x)
-    (not (f x)))
-
   (define (list-foreach f l)
     (match l
       ((Nil) Unit)
       ((Cons x xs) (progn
                      (f x)
                      (list-foreach f xs)))))
-
-  (declare substring (String -> Integer -> Integer -> String))
-  (define (substring str start end)
-    (let ((real-start (max 0 (min start end)))
-          (real-end (min (string-length str) (max start end))))
-      (lisp String (real-start real-end str)
-        (cl:subseq str real-start real-end))))
 
   (declare split-string (Char -> String -> (List String)))
   (define (split-string c s)
@@ -99,22 +77,6 @@
     "Parse the string S as an integer, or error."
     (fromSome "Failed to parse integer." (parse-int s)))
 
-  (define (car x)
-    (match x
-      ((Nil) (error "meh"))
-      ((Cons x _) x)))
-
-  (declare cdr ((List :a) -> (List :a)))
-  (define (cdr xs)                      ; should be in stdlib
-    "Return the traditional cdr of a list XS."
-    (match xs
-      ((Cons _ xs) xs)
-      ((Nil) Nil)))
-
-  (declare nth (Integer -> (List :t) -> :t))
-  (define (nth n l)
-    (fromSome "There is no NTH" (index l n)))
-
   (declare singleton-list? ((List :t) -> Boolean))
   (define (singleton-list? x)
     (match x
@@ -122,29 +84,5 @@
       ((Cons _ (Nil)) True)
       (_              False)))
 
-  (declare partition-by ((:a -> Boolean) -> (List :a) -> (Tuple (List :a) (List :a))))
-  (define (partition-by f l)
-    "Split L into two lists, one whose elements satisfy F, and one that doesn't."
-    (let ((rec (fn (remaining yes no)
-                 (match remaining
-                   ((Nil) (Tuple yes no))
-                   ((Cons x xs)
-                    (if (f x)
-                        (rec xs (Cons x yes) no)
-                        (rec xs yes          (Cons x no))))))))
-      (rec l Nil Nil)))
-
-  (declare equivalence-classes-by ((:a -> :a -> Boolean) -> (List :a) -> (List (List :a))))
-  (define (equivalence-classes-by f l)
-    "Break L into a list of equivalence classes according to F."
-    (let ((rec (fn (remaining partitions)
-                 (match remaining
-                   ((Nil) partitions)
-                   ((Cons x xs)
-                    (match (partition-by (f x) remaining)
-                      ((Tuple yes no)
-                       (rec no (Cons (Cons x yes) partitions)))))))))
-      (rec l Nil)))
-
-  (declare equivalence-classes (Eq :a => ((List :a) -> (List (List :a)))))
-  (define equivalence-classes (equivalence-classes-by ==)))
+  (define partition-by partition)
+)
